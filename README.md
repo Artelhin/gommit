@@ -40,3 +40,5 @@ gommit -pre 'QUEUE-123' -suf '[skip-ci]' -m 'refactor documentation'
     }
 }
 ```
+
+## Test
