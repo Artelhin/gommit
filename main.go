@@ -6,7 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
+	"io/fs"
 	"os"
 	"os/exec"
 	"regexp"
@@ -44,7 +44,8 @@ type BranchConfig struct {
 func main() {
 	config, err := parseBranchPrefixMappingFile()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 
 	//b, _ := json.Marshal(config)
@@ -138,14 +139,20 @@ func findGitDir() (string, error) {
 		return "", fmt.Errorf("can't get current directory: %s", err)
 	}
 	for curDir != "" {
+		fmt.Println(curDir)
 		stat, err := os.Stat(".git")
-		if err != nil && err != os.ErrNotExist {
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
 			return "", fmt.Errorf("can't look for .git directory: %s", err)
 		}
-		if stat.IsDir() {
-			return curDir + "/.git", nil
+		if err == nil {
+			if stat.IsDir() {
+				return curDir + "/.git", nil
+			}
 		}
-		cdUpRegexp.ReplaceAllString(curDir, "")
+		curDir = cdUpRegexp.ReplaceAllString(curDir, "")
+		if err = os.Chdir(curDir); err != nil {
+			return "", fmt.Errorf("can't change working directory: %s", err)
+		}
 	}
 	return "", errors.New("not a Git repository")
 }
