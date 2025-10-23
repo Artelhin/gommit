@@ -48,16 +48,10 @@ func main() {
 		return
 	}
 
-	//b, _ := json.Marshal(config)
-	//fmt.Println(string(b))
-
 	cmd := exec.Command("git", "branch", "--show-current")
 	out, err := cmd.Output()
 	branch := string(out[:len(out)-1]) // drop /n symbol
-
 	bconfig := config.Branches[branch]
-	//b, _ = json.Marshal(bconfig)
-	//fmt.Println(string(b))
 
 	var (
 		prefix, suffix string
@@ -83,7 +77,7 @@ func main() {
 	}
 
 	message := strings.Join([]string{prefix, mFlag, suffix}, " ")
-	fmt.Printf("commiting on branch %s\n%s\n", branch, message)
+	fmt.Printf("commiting to branch ->> %s\n", branch)
 
 	cmd = exec.Command("git", "commit", "-m", message)
 	out, err = cmd.Output()
@@ -139,7 +133,6 @@ func findGitDir() (string, error) {
 		return "", fmt.Errorf("can't get current directory: %s", err)
 	}
 	for curDir != "" {
-		fmt.Println(curDir)
 		stat, err := os.Stat(".git")
 		if err != nil && !errors.Is(err, fs.ErrNotExist) {
 			return "", fmt.Errorf("can't look for .git directory: %s", err)
