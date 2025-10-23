@@ -35,7 +35,7 @@ gommit -pre 'QUEUE-123' -suf '[skip-ci]' -m 'refactor documentation'
             "suffix": "[skip-linter]"
         },
         "QUEUE-123": {
-            "prefix": "QUEUE-123",
+            "prefix": "QUEUE-123:",
         }
     }
 }
