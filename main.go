@@ -90,15 +90,7 @@ func main() {
 		bconfig.Prefix = prefix
 		bconfig.Suffix = suffix
 		config.Branches[branch] = bconfig
-		b, err := json.Marshal(config)
-		if err != nil {
-			fmt.Printf("failed to update config: %s\nedit manually at .git/gommit.json", err)
-			return
-		}
-		err = modifyConfig(b)
-		if err != nil {
-			fmt.Printf("failed to write to config file: %s\nedit manually at .git/gommit.json", err)
-		}
+		saveConfig(config)
 	}
 }
 
@@ -150,7 +142,14 @@ func findGitDir() (string, error) {
 	return "", errors.New("not a Git repository")
 }
 
-func modifyConfig(b []byte) error {
-	_, err := configFile.WriteAt(b, 0)
-	return err
+func saveConfig(config *Config) {
+	b, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		fmt.Printf("failed to update config: %s\nedit manually at .git/gommit.json", err)
+		return
+	}
+	_, err = configFile.WriteAt(b, 0)
+	if err != nil {
+		fmt.Printf("failed to write to config file: %s\nedit manually at .git/gommit.json", err)
+	}
 }
