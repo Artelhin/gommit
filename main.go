@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-const version = "v0.1.3"
+const version = "v0.1.4"
 
 var (
 	mFlag   string
