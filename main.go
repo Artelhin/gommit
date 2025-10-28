@@ -84,17 +84,17 @@ func main() {
 		suffix = bconfig.Suffix
 	}
 
-	if mFlag == "" {
-		fmt.Println("abort due to empty commit message")
-		return
-	}
-
 	if setFlag {
 		bconfig.Prefix = prefix
 		bconfig.Suffix = suffix
 		config.Branches[branch] = bconfig
 		saveConfig(config)
 		fmt.Printf("updated config for branch %s\n", branch)
+		return
+	}
+
+	if mFlag == "" {
+		fmt.Println("abort due to empty commit message")
 		return
 	}
 
