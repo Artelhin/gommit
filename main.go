@@ -108,7 +108,7 @@ func parseBranchPrefixMappingFile() (*Config, error) {
 		return nil, fmt.Errorf("can't find .git dir: %s", err)
 	}
 
-	configFile, err = os.OpenFile(gitPath+"/gommit.json", os.O_CREATE, os.ModePerm)
+	configFile, err = os.OpenFile(gitPath+"/gommit.json", os.O_CREATE|os.O_RDWR, os.ModePerm)
 	b, err := io.ReadAll(configFile)
 	if err != nil {
 		return nil, fmt.Errorf("can't read gommit config: %s", err)
