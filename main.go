@@ -90,15 +90,7 @@ func main() {
 		bconfig.Prefix = prefix
 		bconfig.Suffix = suffix
 		config.Branches[branch] = bconfig
-		b, err := json.Marshal(config)
-		if err != nil {
-			fmt.Printf("failed to update config: %s\nedit manually at .git/gommit.json", err)
-			return
-		}
-		err = modifyConfig(b)
-		if err != nil {
-			fmt.Printf("failed to write to config file: %s\nedit manually at .git/gommit.json", err)
-		}
+		saveConfig(config)
 	}
 }
 
@@ -108,7 +100,7 @@ func parseBranchPrefixMappingFile() (*Config, error) {
 		return nil, fmt.Errorf("can't find .git dir: %s", err)
 	}
 
-	configFile, err = os.OpenFile(gitPath+"/gommit.json", os.O_CREATE, os.ModePerm)
+	configFile, err = os.OpenFile(gitPath+"/gommit.json", os.O_CREATE|os.O_RDWR, os.ModePerm)
 	b, err := io.ReadAll(configFile)
 	if err != nil {
 		return nil, fmt.Errorf("can't read gommit config: %s", err)
@@ -150,7 +142,14 @@ func findGitDir() (string, error) {
 	return "", errors.New("not a Git repository")
 }
 
-func modifyConfig(b []byte) error {
-	_, err := configFile.WriteAt(b, 0)
-	return err
+func saveConfig(config *Config) {
+	b, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		fmt.Printf("failed to update config: %s\nedit manually at .git/gommit.json", err)
+		return
+	}
+	_, err = configFile.WriteAt(b, 0)
+	if err != nil {
+		fmt.Printf("failed to write to config file: %s\nedit manually at .git/gommit.json", err)
+	}
 }
