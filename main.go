@@ -13,10 +13,16 @@ import (
 	"strings"
 )
 
+const version = "v0.1.3"
+
 var (
 	mFlag   string
 	preFlag string
 	sufFlag string
+
+	versionFlag bool
+
+	setFlag bool
 )
 
 var configFile *os.File
@@ -29,6 +35,8 @@ func init() {
 	flag.StringVar(&mFlag, "m", "", "-m <msg> use given message as git commit -m <msg> with configured pre- and suffixes")
 	flag.StringVar(&preFlag, "pre", "", "-pre <prefix> use given prefix as a default prefix for this branch")
 	flag.StringVar(&sufFlag, "suf", "", "-suf <sufffix> use given sufffix as a default sufffix for this branch")
+	flag.BoolVar(&versionFlag, "version", false, "-version shows gommit version")
+	flag.BoolVar(&setFlag, "set", false, "-set uses info from -pre and -suf flags to update config without committing anything")
 	flag.Parse()
 }
 
@@ -42,6 +50,11 @@ type BranchConfig struct {
 }
 
 func main() {
+	if versionFlag {
+		fmt.Println(version)
+		return
+	}
+
 	config, err := parseBranchPrefixMappingFile()
 	if err != nil {
 		fmt.Println(err)
@@ -73,6 +86,15 @@ func main() {
 
 	if mFlag == "" {
 		fmt.Println("abort due to empty commit message")
+		return
+	}
+
+	if setFlag {
+		bconfig.Prefix = prefix
+		bconfig.Suffix = suffix
+		config.Branches[branch] = bconfig
+		saveConfig(config)
+		fmt.Printf("updated config for branch %s\n", branch)
 		return
 	}
 
