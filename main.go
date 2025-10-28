@@ -60,6 +60,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	defer configFile.Close()
 
 	cmd := exec.Command("git", "branch", "--show-current")
 	out, err := cmd.Output()
@@ -169,6 +170,10 @@ func saveConfig(config *Config) {
 	if err != nil {
 		fmt.Printf("failed to update config: %s\nedit manually at .git/gommit.json", err)
 		return
+	}
+	err = configFile.Truncate(0)
+	if err != nil {
+		fmt.Printf("failed to overwrite config file: %snedit manually at .git/gommit.json", err)
 	}
 	_, err = configFile.WriteAt(b, 0)
 	if err != nil {
