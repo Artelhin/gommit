@@ -16,6 +16,7 @@ import (
 const version = "v0.1.4"
 
 var (
+	aFlag   bool
 	mFlag   string
 	preFlag string
 	sufFlag string
@@ -32,6 +33,7 @@ const defaultConfig = `{
 }`
 
 func init() {
+	flag.BoolVar(&aFlag, "a", false, "-a stages everything before committing")
 	flag.StringVar(&mFlag, "m", "", "-m <msg> use given message as git commit -m <msg> with configured pre- and suffixes")
 	flag.StringVar(&preFlag, "pre", "", "-pre <prefix> use given prefix as a default prefix for this branch")
 	flag.StringVar(&sufFlag, "suf", "", "-suf <sufffix> use given sufffix as a default sufffix for this branch")
@@ -83,6 +85,15 @@ func main() {
 		suffix = sufFlag
 	} else {
 		suffix = bconfig.Suffix
+	}
+
+	if aFlag {
+		cmd = exec.Command("git", "add", "-A")
+		out, err = cmd.Output()
+		if err != nil {
+			fmt.Printf("can't exec git add: %s\n", err)
+		}
+		fmt.Print(string(out))
 	}
 
 	if setFlag {
