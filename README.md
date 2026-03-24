@@ -22,6 +22,13 @@ Example:
 gommit -pre 'QUEUE-123' -suf '[skip-ci]' -m 'refactor documentation'
 ```
 
+Another useful option is `-a` which runs `git add -A` before anything else. Typical use would look like so:
+
+```
+// this stages and commits all changes made since last commit
+gommit -a -m 'refactor documentation' 
+```
+
 ## Configuration
 
 ```json gommit.json
